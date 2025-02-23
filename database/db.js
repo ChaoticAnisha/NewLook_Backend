@@ -9,7 +9,7 @@ const sequelize = new Sequelize(
     host: process.env.DB_HOST,
     dialect: "postgres",
     port: process.env.DB_PORT || 5432,
-    logging: console.log, // Enable logging for debugging
+    logging: console.log,
   }
 );
 
@@ -19,7 +19,6 @@ async function testConnection() {
     await sequelize.authenticate();
     console.log("Database connection established successfully.");
   } catch (error) {
-    console.error("Unable to connect to the database:", error);
   }
 }
 

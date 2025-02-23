@@ -15,6 +15,11 @@ router.get(
 router.get("/:id", auth, appointmentController.getAppointmentById);
 router.put("/:id", auth, appointmentController.updateAppointment);
 router.post("/", auth, appointmentController.createAppointment);
-router.delete("/:id", auth, appointmentController.deleteAppointment);
+router.delete(
+  "/:id",
+  auth,
+  roleAuth(["user"]),
+  appointmentController.deleteAppointment
+);
 
 module.exports = router;

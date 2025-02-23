@@ -10,6 +10,15 @@ router.post("/login", userController.loginUser);
 router.post("/reset-password", userController.resetPassword);
 router.put("/update-profile", auth, userController.updateProfile);
 
+//User routes
+router.get("/", auth, roleAuth(["user"]), userController.getUser);
+router.get(
+  "/appointments/:id",
+  auth,
+  roleAuth(["user"]),
+  userController.getUserAppointments
+);
+
 // Admin Routes
 router.get("/admin", auth, roleAuth(["admin"]), (req, res) => {
   res.send("Welcome, admin!");

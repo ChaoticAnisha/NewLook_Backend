@@ -33,7 +33,7 @@ const User = db.define(
     },
     role: {
       type: DataTypes.STRING,
-     enum:[],
+      enum: [],
       allowNull: false,
       defaultValue: "user", // Default role is 'user'
     },

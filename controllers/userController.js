@@ -3,11 +3,44 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { Op } = require("sequelize");
 const sequelize = require("../database/db");
+const Appointment = require("../models/Appointment");
+// const { deleteAppointment } = require("./appointmentController");
 
+//Get User
+const getUser = async (req, res) => {
+  console.log("Fetching user");
+  try {
+    const authToken = req.headers.authorization;
+    const token = authToken.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const id = decoded.id;
+
+    const user = await User.findByPk(id);
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: `Server error occurred : ${error.message}` });
+  }
+};
+const getUserAppointments = async (req, res) => {
+  console.log("Fetching user appointments");
+  try {
+    const { id } = req.params;
+    console.log("The id is ", id);
+    const appointments = await Appointment.findAll({
+      where: { userId: id },
+    });
+    console.log("The appointments are ", appointments);
+    res.json(appointments);
+  } catch (error) {
+    console.error("Error fetching user appointments:", error);
+    res.status(500).json({ error: "Server error occurred" });
+  }
+};
 // Register User
 const registerUser = async (req, res) => {
+  console.log("Registering user");
   const { fullname, email, phone_number, username, password, role } = req.body;
-
+  console.log("The request body is ", req.body);
   if (!fullname || !email || !phone_number || !username || !password) {
     return res.status(400).json({
       error: "Please insert all required fields",
@@ -196,7 +229,6 @@ const getUserStats = async (req, res) => {
       usersByRole,
     });
   } catch (error) {
-    console.error("Error fetching user stats:", error);
     res.status(500).json({ error: "Server error occurred" });
   }
 };
@@ -225,7 +257,6 @@ const deleteUser = async (req, res) => {
     await user.destroy();
     res.json({ message: "User deleted successfully" });
   } catch (error) {
-    console.error("Error deleting user:", error);
     res.status(500).json({ error: "Server error occurred" });
   }
 };
@@ -263,6 +294,8 @@ const updateUserRole = async (req, res) => {
 module.exports = {
   registerUser,
   loginUser,
+  getUser,
+  getUserAppointments,
   resetPassword,
   updateProfile,
   getAllUsers,
