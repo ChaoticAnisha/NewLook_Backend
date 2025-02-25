@@ -23,7 +23,8 @@ const Service = db.define(
     },
     category: {
       type: DataTypes.STRING,
-      allowNull: false, 
+      allowNull: false,
+      defaultValue: "General",
     },
   },
   {
@@ -31,8 +32,9 @@ const Service = db.define(
   }
 );
 
-Service.sync({ force: true }) 
-  .then(() => console.log("Service table has been recreated."))
-  .catch((error) => console.error("Error recreating Service table:", error));
+// Sync the model with the database
+Service.sync()
+  .then(() => console.log("Service table is ready."))
+  .catch((error) => console.error("Error creating Service table:", error));
 
 module.exports = Service;

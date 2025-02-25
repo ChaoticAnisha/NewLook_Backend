@@ -17,6 +17,11 @@ const User = db.define(
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
+      validate: {
+        isEmail: {
+          msg: "Invalid email format",
+        },
+      },
     },
     phone_number: {
       type: DataTypes.STRING,
@@ -35,7 +40,8 @@ const User = db.define(
       type: DataTypes.STRING,
       enum: [],
       allowNull: false,
-      defaultValue: "user", // Default role is 'user'
+      defaultValue: "user",
+      // Default role is 'user'
     },
   },
   {

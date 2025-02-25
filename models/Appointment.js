@@ -24,6 +24,9 @@ const Appointment = db.define(
     email: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        isEmail: true,
+      },
     },
     phoneNumber: {
       type: DataTypes.STRING,
@@ -48,7 +51,7 @@ const Appointment = db.define(
 );
 
 // Sync the model with the database
-Appointment.sync({ alter: true })
+Appointment.sync()
   .then(() => console.log("Appointment table is ready."))
   .catch((error) => console.error("Error creating Appointment table:", error));
 

@@ -19,6 +19,7 @@ router.get(
   userController.getUserAppointments
 );
 
+router.delete("/:id", auth, roleAuth(["user"]), userController.deleteUser);
 // Admin Routes
 router.get("/admin", auth, roleAuth(["admin"]), (req, res) => {
   res.send("Welcome, admin!");
@@ -35,12 +36,7 @@ router.get(
   roleAuth(["admin"]),
   userController.getUserStats
 );
-router.delete(
-  "/admin/users/:id",
-  auth,
-  roleAuth(["admin"]),
-  userController.deleteUser
-);
+
 router.put(
   "/admin/users/:id/role",
   auth,

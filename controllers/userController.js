@@ -91,6 +91,7 @@ const registerUser = async (req, res) => {
 // Login User
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
+  console.log("Login attempt:", { email, password });
 
   try {
     const user = await User.findOne({ where: { email } });
@@ -100,6 +101,7 @@ const loginUser = async (req, res) => {
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
+    console.log("Password check result:", isPasswordValid);
 
     if (!isPasswordValid) {
       return res.status(401).json({ error: "Invalid credentials" });
@@ -113,6 +115,7 @@ const loginUser = async (req, res) => {
 
     res.json({ token, role: user.role });
   } catch (error) {
+    console.error("Login error:", error);
     res.status(500).json({ error: "Server error occurred" });
   }
 };

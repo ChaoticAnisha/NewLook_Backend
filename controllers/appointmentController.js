@@ -1,13 +1,27 @@
 const Appointment = require("../models/Appointment");
+const { Op } = require("sequelize");
 
 // Create Appointment
 const createAppointment = async (req, res) => {
   console.log("Executing createAppointment");
   const { name, email, phoneNumber, date, category } = req.body;
   const userId = req.user.id;
-  console.log(userId);
 
   try {
+    // Check for existing appointments in the same time slot
+    const existingAppointment = await Appointment.findOne({
+      where: {
+        date: date,
+        status: {
+          [Op.ne]: "cancelled",
+        },
+      },
+    });
+
+    if (existingAppointment) {
+      return res.status(409).json({ error: "Time slot is already booked" });
+    }
+
     const newAppointment = await Appointment.create({
       userId,
       name,
@@ -17,10 +31,9 @@ const createAppointment = async (req, res) => {
       category,
     });
 
-    // res.status(201).json({ test: "done" });
     res.status(201).json({ success: true, data: newAppointment });
   } catch (error) {
-    console.log(error);
+    console.error("Error creating appointment:", error);
     res.status(500).json({ error: "Server error occurred" });
   }
 };
@@ -28,9 +41,12 @@ const createAppointment = async (req, res) => {
 // Get All Appointments
 const getAllAppointments = async (req, res) => {
   try {
-    const appointments = await Appointment.findAll();
+    const appointments = await Appointment.findAll({
+      order: [["date", "DESC"]],
+    });
     res.json(appointments);
   } catch (error) {
+    console.error("Error fetching appointments:", error);
     res.status(500).json({ error: "Server error occurred" });
   }
 };
@@ -48,6 +64,7 @@ const getAppointmentById = async (req, res) => {
 
     res.json(appointment);
   } catch (error) {
+    console.error("Error fetching appointment:", error);
     res.status(500).json({ error: "Server error occurred" });
   }
 };
@@ -57,26 +74,23 @@ const updateAppointment = async (req, res) => {
   console.log("Executing updateAppointment");
   const { id } = req.params;
   const { status } = req.body;
-  console.log("The id is ", id);
-  console.log("The status from request is ", status);
+
   try {
     const appointment = await Appointment.findByPk(id);
-    console.log("The appointment is ", appointment);
     if (!appointment) {
       return res.status(404).json({ error: "Appointment not found" });
     }
 
     appointment.status = status;
-
     await appointment.save();
-    console.log("The appointment after save is ", appointment);
 
     res.json({
       message: "Appointment updated successfully",
       status: appointment.status,
     });
   } catch (error) {
-    res.status(500).json({ error: `Server error occured , ${error.message}` });
+    console.error("Error updating appointment:", error);
+    res.status(500).json({ error: "Server error occurred" });
   }
 };
 
@@ -86,18 +100,19 @@ const deleteAppointment = async (req, res) => {
 
   try {
     const { id } = req.params;
-    if (!id) res.json({ error: "Id is required" });
+    if (!id) {
+      return res.status(400).json({ error: "Id is required" });
+    }
 
     const appointment = await Appointment.findByPk(id);
-
     if (!appointment) {
       return res.status(404).json({ error: "Appointment not found" });
     }
 
     await appointment.destroy();
-
     res.json({ message: "Appointment deleted successfully" });
   } catch (error) {
+    console.error("Error deleting appointment:", error);
     res.status(500).json({ error: "Server error occurred" });
   }
 };

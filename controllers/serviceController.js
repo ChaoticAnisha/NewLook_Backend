@@ -2,13 +2,14 @@ const Service = require("../models/Service");
 
 // Create Service
 const createService = async (req, res) => {
-  const { icon, title, description } = req.body;
+  const { icon, title, description, category } = req.body;
 
   try {
     const newService = await Service.create({
       icon,
       title,
       description,
+      category,
     });
 
     res.status(201).json(newService);
@@ -21,7 +22,6 @@ const createService = async (req, res) => {
 const getAllServices = async (req, res) => {
   try {
     const services = await Service.findAll();
-    console.log("getAllServices executing", services);
     res.json(services);
   } catch (error) {
     res.status(500).json({ error: "Server error occurred" });
@@ -48,7 +48,7 @@ const getServiceById = async (req, res) => {
 // Update Service
 const updateService = async (req, res) => {
   const { id } = req.params;
-  const { icon, title, description } = req.body;
+  const { icon, title, description, category } = req.body;
 
   try {
     const service = await Service.findByPk(id);
@@ -57,14 +57,17 @@ const updateService = async (req, res) => {
       return res.status(404).json({ error: "Service not found" });
     }
 
-    service.icon = icon;
-    service.title = title;
-    service.description = description;
+    // Only update fields that are provided
+    if (icon !== undefined) service.icon = icon;
+    if (title !== undefined) service.title = title;
+    if (description !== undefined) service.description = description;
+    if (category !== undefined) service.category = category;
 
     await service.save();
 
     res.json({ message: "Service updated successfully" });
   } catch (error) {
+    console.error("Error updating service:", error);
     res.status(500).json({ error: "Server error occurred" });
   }
 };

@@ -27,8 +27,9 @@ sequelize
   .catch((err) => console.error("Database connection error:", err));
 
 // Only start the server if we're not in a test environment
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+if (process.env.NODE_ENV !== "test") {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
 
 module.exports = app;
