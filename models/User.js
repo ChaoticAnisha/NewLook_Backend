@@ -38,10 +38,8 @@ const User = db.define(
     },
     role: {
       type: DataTypes.STRING,
-      enum: [],
       allowNull: false,
       defaultValue: "user",
-      // Default role is 'user'
     },
   },
   {
@@ -50,7 +48,7 @@ const User = db.define(
 );
 
 // Sync the model with the database
-User.sync({ alter: true })
+User.sync()
   .then(() => console.log("User table is ready."))
   .catch((error) => console.error("Error creating User table:", error));
 
